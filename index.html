@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P&C Hiring Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--surface2:#ECEAE4;--border:#D9D6CE;--border-light:#EAE8E2;
+  --text:#1A1916;--text2:#6B6860;--text3:#9B9890;
+  --accent:#1B4FD8;--accent-light:#E8EDFB;--accent-text:#0D2E8A;
+  --green:#1A7A4A;--green-light:#E3F5EC;
+  --amber:#C07A10;--amber-light:#FDF0DC;
+  --red:#C0392B;--red-light:#FDECEA;
+  --teal:#0E7A6E;--teal-light:#E0F5F3;
+  --purple:#5B3DB5;--purple-light:#EDE9FA;
+  --coral:#C04A2B;--coral-light:#FAEDE9;
+  --pink:#B03A7A;--pink-light:#FAE8F2;
+  --shadow:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.09);
+  --r:10px;--r-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* HEADER */
+.hdr{background:var(--text);color:#fff;padding:22px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-icon{width:42px;height:42px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.hdr-title{font-family:'DM Serif Display',serif;font-size:20px;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px}
+.hdr-stats{display:flex;gap:24px}
+.hstat-val{font-size:20px;font-weight:600;font-family:'DM Mono',monospace;color:#fff;text-align:right}
+.hstat-lbl{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.05em;text-align:right}
+
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 88px)}
+
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-section{padding:14px;border-bottom:1px solid var(--border-light)}
+.sb-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.role-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:7px 10px;border-radius:var(--r-sm);border:none;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .12s;text-align:left}
+.role-btn:hover{background:var(--surface2);color:var(--text)}
+.role-btn.active{background:var(--accent-light);color:var(--accent-text);font-weight:500}
+.rbadge{font-size:10px;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--text3);font-family:'DM Mono',monospace}
+.role-btn.active .rbadge{background:var(--accent);color:#fff}
+.feat-chips{max-height:180px;overflow-y:auto}
+.fchip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;margin:2px;transition:all .12s}
+.fchip:hover{border-color:var(--accent);color:var(--accent)}
+.fchip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.fchip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.import-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 14px;border-radius:var(--r-sm);background:var(--green-light);border:1px solid var(--green);color:var(--green);font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;font-family:'DM Sans',sans-serif}
+.import-btn:hover{background:var(--green);color:#fff}
+
+/* CONTENT */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:300px}
+.search-wrap input{width:100%;padding:7px 10px 7px 32px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border .15s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.fcount-tabs{display:flex;gap:3px;flex-wrap:wrap}
+.fct{font-size:11px;padding:5px 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-family:'DM Mono',monospace;transition:all .12s}
+.fct:hover{border-color:var(--accent);color:var(--accent)}
+.fct.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.toggle-lbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;margin-left:auto}
+.toggle-lbl input{cursor:pointer;accent-color:var(--accent)}
+
+/* COMBO LIST */
+.list-wrap{flex:1;overflow-y:auto;padding:14px 20px}
+.count-info{font-size:12px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.chip-blue{background:var(--accent-light);color:var(--accent-text)}
+.chip-green{background:var(--green-light);color:var(--green)}
+.combo-list{display:flex;flex-direction:column;gap:5px}
+
+.combo-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .15s,border-color .15s}
+.combo-card:hover{box-shadow:var(--shadow-md);border-color:var(--border)}
+.combo-card.has-hiring{border-left:3px solid var(--accent)}
+.combo-card.imported{border-left:3px solid var(--green)}
+
+.combo-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none}
+.combo-idx{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);min-width:36px;flex-shrink:0}
+.feat-pills{display:flex;flex-wrap:wrap;gap:3px;flex:1}
+.pill{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.p-blue{background:var(--accent-light);color:var(--accent-text)}
+.p-teal{background:var(--teal-light);color:var(--teal)}
+.p-amber{background:var(--amber-light);color:var(--amber)}
+.p-coral{background:var(--coral-light);color:var(--coral)}
+.p-purple{background:var(--purple-light);color:var(--purple)}
+.p-green{background:var(--green-light);color:var(--green)}
+.p-pink{background:var(--pink-light);color:var(--pink)}
+.p-gray{background:var(--surface2);color:var(--text2)}
+.combo-meta{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.h-tag{font-size:10px;padding:3px 9px;border-radius:20px;background:var(--accent);color:#fff;font-weight:500;white-space:nowrap}
+.h-tag-new{font-size:10px;padding:3px 9px;border-radius:20px;background:var(--green);color:#fff;font-weight:500;white-space:nowrap}
+.c-badge{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--text3);font-family:'DM Mono',monospace}
+.no-h{font-size:11px;color:var(--text3);font-style:italic}
+.chev{font-size:13px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.chev.open{transform:rotate(180deg)}
+
+/* DETAIL */
+.combo-detail{display:none;border-top:1px solid var(--border-light)}
+.combo-detail.open{display:block}
+.h-block{padding:14px 16px;border-bottom:1px solid var(--border-light)}
+.h-block:last-child{border-bottom:none}
+.h-block-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.h-block-name{font-size:13px;font-weight:600;color:var(--text)}
+.h-block-role{font-size:11px;color:var(--text3);margin-top:2px}
+.cand-tbl{width:100%;border-collapse:collapse}
+.cand-tbl th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border-light)}
+.cand-tbl td{padding:8px 10px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+.cand-tbl tr:last-child td{border-bottom:none}
+.cand-tbl tr:hover td{background:var(--bg)}
+.c-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-light);color:var(--accent-text);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'DM Mono',monospace}
+.c-name-cell{display:flex;align-items:center;gap:8px}
+.c-name{font-size:12px;font-weight:500;color:var(--text)}
+.c-contact{font-size:10px;color:var(--text3);margin-top:1px;font-family:'DM Mono',monospace}
+.c-fb{font-size:11px;color:var(--text2);max-width:220px}
+.sp{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;white-space:nowrap;display:inline-block}
+.sp-ok{background:var(--green-light);color:var(--green)}
+.sp-warn{background:var(--amber-light);color:var(--amber)}
+.sp-issue{background:var(--red-light);color:var(--red)}
+.sp-pend{background:var(--surface2);color:var(--text3)}
+.rpt-link{font-size:11px;color:var(--accent);text-decoration:none;font-weight:500}
+.rpt-link:hover{text-decoration:underline}
+.no-rpt{font-size:11px;color:var(--text3);font-style:italic}
+.no-h-msg{padding:14px 16px;font-size:12px;color:var(--text3);font-style:italic}
+
+/* PAGINATION */
+.pager{display:flex;align-items:center;gap:4px;padding:12px 20px;background:var(--surface);border-top:1px solid var(--border);flex-wrap:wrap}
+.pg-btn{padding:5px 11px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .12s}
+.pg-btn:hover:not([disabled]){border-color:var(--accent);color:var(--accent)}
+.pg-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.pg-btn[disabled]{opacity:.35;cursor:default}
+.pg-info{font-size:11px;color:var(--text3);margin-left:6px;font-family:'DM Mono',monospace}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.2);width:100%;max-width:620px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-hdr{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.modal-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text)}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.modal-x{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;transition:background .12s}
+.modal-x:hover{background:var(--surface2)}
+.modal-body{padding:18px 22px;overflow-y:auto;flex:1}
+.field-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;margin-top:14px}
+.field-label:first-child{margin-top:0}
+.format-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;margin-bottom:4px}
+.sel{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r-sm);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none;cursor:pointer}
+.sel:focus{border-color:var(--accent)}
+.paste-area{width:100%;min-height:180px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);font-family:'DM Mono',monospace;font-size:12px;background:var(--bg);color:var(--text);resize:vertical;outline:none;transition:border .15s}
+.paste-area:focus{border-color:var(--accent)}
+.preview-box{margin-top:12px;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;display:none}
+.preview-box.show{display:block}
+.preview-hdr{padding:7px 12px;background:var(--surface2);font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;display:flex;justify-content:space-between}
+.preview-body{max-height:160px;overflow-y:auto}
+.prow{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--border-light);font-size:12px}
+.prow:last-child{border-bottom:none}
+.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pdot-ok{background:var(--green)}
+.pdot-warn{background:var(--amber)}
+.pdot-gray{background:var(--text3)}
+.pname{flex:1;font-weight:500;color:var(--text)}
+.pfb{flex:2;color:var(--text2)}
+.modal-ftr{padding:12px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.note{font-size:11px;color:var(--text3)}
+.btn-row{display:flex;gap:8px}
+.btn{padding:8px 18px;border-radius:var(--r-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s}
+.btn-primary{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.btn-primary:hover{background:var(--accent-text);border-color:var(--accent-text)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--surface2)}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-icon">📋</div>
+    <div>
+      <div class="hdr-title">P&C Hiring Dashboard</div>
+      <div class="hdr-sub">Candidate performance by interview combination</div>
+    </div>
+  </div>
+  <div class="hdr-stats" id="hdrStats"></div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Filter by Role</div>
+      <div id="roleList"></div>
+    </div>
+    <div class="sb-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+      <div class="sb-label">Filter by Feature</div>
+      <div class="feat-chips" id="featChips"></div>
+    </div>
+    <div class="sb-section">
+      <button class="import-btn" onclick="openModal()">＋ Import Candidate Data</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search feature, hiring, candidate..." oninput="onSearch()">
+      </div>
+      <div class="fcount-tabs" id="fcountTabs"></div>
+      <label class="toggle-lbl">
+        <input type="checkbox" id="onlyHiring" onchange="render()"> With hiring only
+      </label>
+    </div>
+
+    <div class="list-wrap">
+      <div class="count-info" id="countInfo"></div>
+      <div class="combo-list" id="comboList"></div>
+    </div>
+
+    <div class="pager" id="pager"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title">Import Candidate Data</div>
+        <div class="modal-sub">Paste from Excel/Sheets — auto-mapped to the selected hiring</div>
+      </div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-label">Expected format (tab-separated)</div>
+      <div class="format-box">NAME &nbsp; REPORT &nbsp; CONTACT NO &nbsp; FEEDBACK<br>Riya Sharma &nbsp; https://drive.google.com/... &nbsp; 9876543210 &nbsp; No issues<br>Arjun Mehta &nbsp;&nbsp;&nbsp;&nbsp; 8765432109 &nbsp; Audio not working</div>
+      <div class="field-label">Select hiring</div>
+      <select class="sel" id="hiringSelect"></select>
+      <div class="field-label">Paste data here</div>
+      <textarea class="paste-area" id="pasteArea" placeholder="Copy rows from Excel or Google Sheets and paste here..." oninput="previewParse()"></textarea>
+      <div class="preview-box" id="previewBox">
+        <div class="preview-hdr">
+          <span>Preview — <span id="previewCount">0</span> candidates parsed</span>
+          <span id="previewOk" style="color:var(--green);font-weight:600">✓ Ready</span>
+        </div>
+        <div class="preview-body" id="previewBody"></div>
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <div class="note">💡 Imported data persists until you close the tab</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="doImport()">Import</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var FEATURES = [
+  {key:"monitors",   label:"Multiple monitors",  color:"p-blue",  dot:"#1B4FD8"},
+  {key:"plagiarism", label:"AI plagiarism",       color:"p-green", dot:"#1A7A4A"},
+  {key:"copypaste",  label:"Copy / paste",        color:"p-blue",  dot:"#1B4FD8"},
+  {key:"tab",        label:"Tab proctoring",      color:"p-coral", dot:"#C04A2B"},
+  {key:"multipeople",label:"Multiple people",     color:"p-amber", dot:"#C07A10"},
+  {key:"lookaway",   label:"Looking away",        color:"p-teal",  dot:"#0E7A6E"},
+  {key:"desktop",    label:"Desktop environment", color:"p-gray",  dot:"#6B6860"},
+  {key:"mobile",     label:"Mobile access",       color:"p-pink",  dot:"#B03A7A"},
+  {key:"lipsync",    label:"Lip sync",            color:"p-pink",  dot:"#B03A7A"},
+  {key:"followup",   label:"Follow-up questions", color:"p-amber", dot:"#C07A10"},
+  {key:"fullscreen", label:"Full-screen mode",    color:"p-coral", dot:"#C04A2B"},
+  {key:"aiavatar",   label:"AI avatar",           color:"p-purple",dot:"#5B3DB5"}
+];
+
+var HIRINGS = [
+  {id:"PY1",name:"Python Developer 1",role:"Python Developer",features:["monitors","lookaway","multipeople","aiavatar","tab"],imported:false,candidates:[
+    {name:"Karan Kumar Singh",report:"https://drive.google.com/file/d/1n3itnIs1tresT22E9kUbE9Ei51Uxyh2H/view",contact:"7050146225",feedback:"No issues encountered."},
+    {name:"Akshat Bhatt",report:null,contact:"7018501792",feedback:""},
+    {name:"Bhagyodaya Bamgonda",report:"https://drive.google.com/file/d/1GLckSFOz32Z2p5Zj4HNVaRH3-Xv1XjJT/view",contact:"9359944255",feedback:"No issues encountered."},
+    {name:"Harsh Gupta",report:"https://drive.google.com/file/d/18MkdufUNbeObD6M0GHCO9h6mpOXM0ADs/view",contact:"9311157678",feedback:"No issues encountered."},
+    {name:"Nilesh Singh",report:"https://drive.google.com/file/d/1u78d2cY9xe8_EtN651q3IaVsGji1YaaQ/view",contact:"9004647523",feedback:"No issues encountered."},
+    {name:"Prudhvi Teja Kukkunuri",report:"https://drive.google.com/file/d/1FKmM-QrHq2Prz2OcCeLOSc6DTBnSmFUr/view",contact:"8121516393",feedback:"No issues encountered."},
+    {name:"Rajvardhan Singh Chawda",report:null,contact:"9407822937",feedback:""},
+    {name:"Sakshi Madane",report:"https://drive.google.com/file/d/1szrY9xMmAYMHy91bjypFXIUQi7IPgKMh/view",contact:"7276974010",feedback:""},
+    {name:"Kotha sai Krishna",report:"https://drive.google.com/file/d/1K8d-Z9cE00h6Ecjo4_8Gs80PmDPMR6BQ/view",contact:"7075537961",feedback:"No issues encountered."},
+    {name:"Pankaj Badgujar",report:"https://drive.google.com/file/d/1WP9vKmuOiEr5SbDhgJ31GrRvWQVUI4sF/view",contact:"9322819173",feedback:"No issues encountered."},
+    {name:"Prem Sai Valluru",report:"https://drive.google.com/file/d/1OaY5fL2jOh5Wk6bxUFqXOzYlykFP-QmA/view",contact:"9391530779",feedback:""}
+  ]},
+  {id:"PY2",name:"Python Developer 2",role:"Python Developer",features:["monitors","plagiarism","copypaste","tab","multipeople","lookaway","aiavatar","followup"],imported:false,candidates:[
+    {name:"Preetam Patel",report:null,contact:"9993296509",feedback:""},
+    {name:"Athul Krishna",report:"https://drive.google.com/file/d/1pKJ5EutqSPMbeJQ2ZEDx9pYHWgT7AxKh/view",contact:"8848943819",feedback:"No issue encountered"},
+    {name:"Bhavesh Motghare",report:null,contact:"8817367458",feedback:""},
+    {name:"Jaswinder Singh",report:"https://drive.google.com/file/d/1P04kg7TyU9_RRPeMfNWy2q-1n6FweUFc/view",contact:"8544965742",feedback:"No issue encountered"},
+    {name:"Ayushi Patel",report:"https://drive.google.com/file/d/1IFDUHMEHvVVPyZ_8qqqnlc6OI2pxeWsY/view",contact:"8799008546",feedback:"No issue encountered"},
+    {name:"Ankita Roy",report:"https://drive.google.com/file/d/1KWijz-MeYNriFGEwCz7qKWyN0AdUmrqI/view",contact:"9828758568",feedback:"No issue encountered"},
+    {name:"Tushar Dahiya",report:"https://drive.google.com/file/d/11Pq7tga5sW6EqYF49ERALxXkqxKp4n08/view",contact:"9416411597",feedback:"No issue encountered"},
+    {name:"Sarthak Pandey",report:null,contact:"9582563715",feedback:""},
+    {name:"Aryan Katiyar",report:null,contact:"9026322761",feedback:""}
+  ]},
+  {id:"PY3",name:"Python Developer 3",role:"Python Developer",features:["monitors","plagiarism","copypaste","tab"],imported:false,candidates:[
+    {name:"Preetam Patel",report:null,contact:"9993296509",feedback:""},
+    {name:"Athul Krishna",report:"https://drive.google.com/file/d/1pKJ5EutqSPMbeJQ2ZEDx9pYHWgT7AxKh/view",contact:"8848943819",feedback:"No issue encountered"},
+    {name:"Ankita Roy",report:"https://drive.google.com/file/d/1KWijz-MeYNriFGEwCz7qKWyN0AdUmrqI/view",contact:"9828758568",feedback:"No issue encountered"},
+    {name:"Tushar Dahiya",report:"https://drive.google.com/file/d/11Pq7tga5sW6EqYF49ERALxXkqxKp4n08/view",contact:"9416411597",feedback:"No issue encountered"}
+  ]},
+  {id:"HR1",name:"Human Resources 1",role:"Human Resources",features:["plagiarism","followup"],imported:false,candidates:[
+    {name:"Manav Natekar",report:null,contact:"7021640374",feedback:""},
+    {name:"Aditi Jindal",report:"https://drive.google.com/file/d/1RkZyWNqniqPY-ehNjgO9S_E3VDNfzeW5/view",contact:"9996712620",feedback:""},
+    {name:"Anshika Yadav",report:"https://drive.google.com/file/d/1tqBUFjIoGmMvuVYZN8t7MMGt6OTdI2T9/view",contact:"9899991201",feedback:"No issues; minor delay despite stable network."},
+    {name:"Ronith Bodepudi",report:"https://drive.google.com/file/d/1QdRQqsu5A7SDxwNzILGI61PvOVnP6TWJ/view",contact:"9490406611",feedback:"Delay in question upload; otherwise, no issues."},
+    {name:"Tavleen Kaur",report:null,contact:"9811884996",feedback:""}
+  ]},
+  {id:"HR2",name:"Human Resources 2",role:"Human Resources",features:["lookaway","multipeople"],imported:false,candidates:[
+    {name:"Manav Natekar",report:null,contact:"7021640374",feedback:""},
+    {name:"Anshika Yadav",report:"https://drive.google.com/file/d/1tqBUFjIoGmMvuVYZN8t7MMGt6OTdI2T9/view",contact:"9899991201",feedback:"No issues; minor delay despite stable network."},
+    {name:"Ronith Bodepudi",report:"https://drive.google.com/file/d/1QdRQqsu5A7SDxwNzILGI61PvOVnP6TWJ/view",contact:"9490406611",feedback:"Delay in question upload; otherwise, no issues."}
+  ]},
+  {id:"HR3",name:"Human Resources 3",role:"Human Resources",features:["lookaway","aiavatar"],imported:false,candidates:[
+    {name:"Anshika Yadav",report:"https://drive.google.com/file/d/1tqBUFjIoGmMvuVYZN8t7MMGt6OTdI2T9/view",contact:"9899991201",feedback:"No issues; minor delay despite stable network."},
+    {name:"Ronith Bodepudi",report:"https://drive.google.com/file/d/1QdRQqsu5A7SDxwNzILGI61PvOVnP6TWJ/view",contact:"9490406611",feedback:"Delay in question upload; otherwise, no issues."}
+  ]},
+  {id:"HR4",name:"Human Resources 4",role:"Human Resources",features:["multipeople","aiavatar"],imported:false,candidates:[
+    {name:"Anshika Yadav",report:"https://drive.google.com/file/d/1tqBUFjIoGmMvuVYZN8t7MMGt6OTdI2T9/view",contact:"9899991201",feedback:"No issues; minor delay despite stable network."},
+    {name:"Ronith Bodepudi",report:"https://drive.google.com/file/d/1QdRQqsu5A7SDxwNzILGI61PvOVnP6TWJ/view",contact:"9490406611",feedback:"Delay in question upload; otherwise, no issues."}
+  ]},
+  {id:"HR5",name:"Human Resources 5",role:"Human Resources",features:["lookaway","followup"],imported:false,candidates:[
+    {name:"Anshika Yadav",report:"https://drive.google.com/file/d/1tqBUFjIoGmMvuVYZN8t7MMGt6OTdI2T9/view",contact:"9899991201",feedback:"No issues; minor delay despite stable network."},
+    {name:"Ronith Bodepudi",report:"https://drive.google.com/file/d/1QdRQqsu5A7SDxwNzILGI61PvOVnP6TWJ/view",contact:"9490406611",feedback:"Delay in question upload; otherwise, no issues."}
+  ]},
+  {id:"HR6",name:"Human Resources 6",role:"Human Resources",features:["plagiarism","copypaste","tab"],imported:false,candidates:[
+    {name:"Indranil Chakraborty",report:null,contact:"8599939991",feedback:""},
+    {name:"Aditi Singh",report:null,contact:"7355037180",feedback:""},
+    {name:"Shweta Shukla",report:null,contact:"9558461548",feedback:""},
+    {name:"Kavita Jangir",report:null,contact:"9694728743",feedback:""},
+    {name:"Akshara Venkatraman",report:null,contact:"9840773474",feedback:""}
+  ]},
+  {id:"HR7",name:"Human Resources 7",role:"Human Resources",features:["monitors","tab","copypaste"],imported:false,candidates:[
+    {name:"Nitu Karmakar",report:null,contact:"9905440466",feedback:""},
+    {name:"Anushka Singh",report:null,contact:"7520791603",feedback:""},
+    {name:"Akash Kumar Mittal",report:null,contact:"9508217260",feedback:""},
+    {name:"Mohd Zaid",report:null,contact:"6396209238",feedback:""},
+    {name:"Sabyasachi Bhattacharjee",report:null,contact:"9332321800",feedback:""}
+  ]},
+  {id:"HR8",name:"Human Resources 8",role:"Human Resources",features:["plagiarism","followup","copypaste"],imported:false,candidates:[
+    {name:"Navish Takhi",report:null,contact:"8198890898",feedback:""},
+    {name:"Rudri Upadhyay",report:null,contact:"9054471130",feedback:""},
+    {name:"Pranjal Bansal",report:null,contact:"9872395500",feedback:""},
+    {name:"Pari Kataria",report:null,contact:"8287002236",feedback:""},
+    {name:"Gouri Gupta",report:null,contact:"9818745363",feedback:""}
+  ]},
+  {id:"HR9",name:"Human Resources 9",role:"Human Resources",features:["plagiarism","monitors","tab"],imported:false,candidates:[
+    {name:"Navish Takhi",report:null,contact:"8198890898",feedback:""},
+    {name:"Rishit Sharma",report:null,contact:"7983290160",feedback:""},
+    {name:"Debasmita Seal",report:null,contact:"9088683851",feedback:""},
+    {name:"Gouri Gupta",report:null,contact:"9818745363",feedback:""}
+  ]},
+  {id:"HR10",name:"Human Resources 10",role:"Human Resources",features:["lookaway","multipeople","tab"],imported:false,candidates:[
+    {name:"Alisha Riyaz",report:null,contact:"7668115983",feedback:""},
+    {name:"Kanak Agrawal",report:null,contact:"7972658491",feedback:""},
+    {name:"Priyanka Mukhedkar",report:null,contact:"9112280090",feedback:""},
+    {name:"Bogireddy Nithin Kumar Reddy",report:"https://drive.google.com/file/d/1LnG2daKpOSczUN_zVqO1YgX-sKUWljm3/view",contact:"9652116447",feedback:"No issues encountered."}
+  ]},
+  {id:"AI1",name:"AI 1",role:"AI",features:["lookaway","aiavatar","followup"],imported:false,candidates:[
+    {name:"Muruga Pandian",report:null,contact:"9894845721",feedback:"Didn't pick"},
+    {name:"Shivani Chaudhary",report:null,contact:"8104893630",feedback:"Audio errors"},
+    {name:"Vikash Kumar Gupta",report:null,contact:"8604833421",feedback:"Server issues"},
+    {name:"Rishabh",report:null,contact:"7018778798",feedback:"Call done — no difficulties"},
+    {name:"Divya Ramnani",report:null,contact:"7722839809",feedback:"Time slot issues"}
+  ]},
+  {id:"AI2",name:"AI 2",role:"AI",features:["multipeople","aiavatar","tab"],imported:false,candidates:[
+    {name:"Aaryan Kumar",report:null,contact:"9368581262",feedback:"Didn't pick"},
+    {name:"Aishwarya Sinha",report:null,contact:"8303736487",feedback:"Audio issues"},
+    {name:"Swaraj Ladke",report:null,contact:"9359123490",feedback:"Sound and text issues"},
+    {name:"Gajanan Dhangude",report:null,contact:"9579087176",feedback:"Too many follow-up questions"}
+  ]},
+  {id:"DM1",name:"Digital Marketing 1",role:"Digital Marketing",features:["plagiarism","followup","aiavatar"],imported:false,candidates:[
+    {name:"Sanjana Kumbar",report:null,contact:"7019857773",feedback:"Didn't pick"},
+    {name:"Ankit Nagar",report:null,contact:"9352170818",feedback:"Call done"},
+    {name:"Mohammed Ayyan",report:null,contact:"8209197749",feedback:"Call done"},
+    {name:"Khushi Chandekar",report:null,contact:"7303971546",feedback:"Call done"},
+    {name:"Shriya Saxena",report:null,contact:"7982728630",feedback:"Call done"}
+  ]},
+  {id:"DM2",name:"Digital Marketing 2",role:"Digital Marketing",features:["copypaste","followup","tab"],imported:false,candidates:[
+    {name:"Vinod Kumar",report:null,contact:"7015303939",feedback:"Call done"},
+    {name:"Madhurya Alluri",report:null,contact:"7680942698",feedback:"Call done"},
+    {name:"Namrata Parpyani",report:null,contact:"7225855123",feedback:"Call done"},
+    {name:"Mahi Goel",report:null,contact:"9569186896",feedback:"Call done"},
+    {name:"Vijay Pratap Singh",report:null,contact:"7355930086",feedback:"Didn't pick"}
+  ]},
+  {id:"DM3",name:"Digital Marketing 3",role:"Digital Marketing",features:["plagiarism","lookaway","followup"],imported:false,candidates:[
+    {name:"Sanjana Kumbar",report:null,contact:"7019857773",feedback:"Didn't pick"},
+    {name:"Ankit Nagar",report:null,contact:"9352170818",feedback:"Call done"},
+    {name:"Kavya Surati",report:null,contact:"9082253924",feedback:"Call done"},
+    {name:"Shriya Saxena",report:null,contact:"7982728630",feedback:"Call done"},
+    {name:"Versa R",report:null,contact:"7550216670",feedback:"Didn't pick"}
+  ]},
+  {id:"DM4",name:"Digital Marketing 4",role:"Digital Marketing",features:["multipeople","followup","aiavatar"],imported:false,candidates:[
+    {name:"Mohammed Arshad Abbas",report:null,contact:"9930931806",feedback:"Call done"},
+    {name:"Sneha Kundu",report:null,contact:"6291798972",feedback:"Call done"},
+    {name:"Kanak Singhal",report:null,contact:"7877171402",feedback:"Call done"},
+    {name:"Afnan Sayyad",report:null,contact:"7382362237",feedback:"Call done"}
+  ]},
+  {id:"DM5",name:"Digital Marketing 5",role:"Digital Marketing",features:["tab","copypaste"],imported:false,candidates:[
+    {name:"Pratik Pandey",report:null,contact:"8409493276",feedback:"Call done"},
+    {name:"Rahul Chandra",report:null,contact:"7321012754",feedback:"Call done"},
+    {name:"Hasin Kulapati",report:null,contact:"8327742919",feedback:"Call done"},
+    {name:"Anwesha Roy",report:null,contact:"7602804936",feedback:"Call done"}
+  ]},
+  {id:"DM6",name:"Digital Marketing 6",role:"Digital Marketing",features:["lookaway","multipeople","aiavatar","tab"],imported:false,candidates:[
+    {name:"Ankita Bhandakkar",report:null,contact:"9834095288",feedback:"Call done"},
+    {name:"Shristi Agarwal",report:null,contact:"7980661897",feedback:"Call done"},
+    {name:"Rakhi",report:null,contact:"7303295519",feedback:"Call done"},
+    {name:"Vinod Kumar",report:null,contact:"7015303939",feedback:"Call done"}
+  ]},
+  {id:"UX1",name:"UI/UX Designer 1",role:"UI/UX Designer",features:["plagiarism","copypaste","followup","tab"],imported:false,candidates:[
+    {name:"Vikram Neerukonda",report:null,contact:"8688709794",feedback:""},
+    {name:"Raghasree Kosigi",report:null,contact:"9989180206",feedback:""},
+    {name:"Pushpa Kolli",report:null,contact:"8522063590",feedback:""},
+    {name:"Arava Jaswanth",report:null,contact:"9441427906",feedback:""},
+    {name:"Satyam Gabhne",report:null,contact:"8432217621",feedback:""}
+  ]},
+  {id:"UX2",name:"UI/UX Designer 2",role:"UI/UX Designer",features:["monitors","lookaway","multipeople","tab"],imported:false,candidates:[
+    {name:"Rajesh Derangula",report:null,contact:"9391583806",feedback:""},
+    {name:"Ayushi Rabari",report:null,contact:"8799001855",feedback:""},
+    {name:"Latika Satapathi",report:null,contact:"7760795930",feedback:""},
+    {name:"Sk Afreen Khatun",report:null,contact:"7477397288",feedback:""},
+    {name:"Abdul Rehaman Shaik",report:null,contact:"7075227813",feedback:""}
+  ]},
+  {id:"UX3",name:"UI/UX Designer 3",role:"UI/UX Designer",features:["plagiarism","copypaste","tab","followup","aiavatar"],imported:false,candidates:[
+    {name:"Shalaka Kadam",report:null,contact:"9326571057",feedback:""},
+    {name:"Priyanshi Rathi",report:null,contact:"8002938033",feedback:""},
+    {name:"Sharvika Sahu",report:null,contact:"8318815164",feedback:""},
+    {name:"Shruti Verma",report:null,contact:"9510201401",feedback:""},
+    {name:"Lakshay Agarwal",report:null,contact:"7078895029",feedback:""}
+  ]},
+  {id:"UX4",name:"UI/UX Designer 4",role:"UI/UX Designer",features:["monitors","tab"],imported:false,candidates:[
+    {name:"Vama Shah",report:null,contact:"9172828294",feedback:""},
+    {name:"Senthil Naath S",report:null,contact:"9080483637",feedback:""},
+    {name:"Nishtha Bansal",report:null,contact:"9058270971",feedback:""},
+    {name:"Darshan T V",report:null,contact:"9686169207",feedback:""},
+    {name:"Aditya Patwa",report:null,contact:"9819244295",feedback:""}
+  ]},
+  {id:"IOS1",name:"iOS Testing",role:"iOS Testing",features:["plagiarism","copypaste"],imported:false,candidates:[
+    {name:"Rutika Sawant",report:null,contact:"9969115193",feedback:""},
+    {name:"Shiva Chavhan",report:null,contact:"8408060967",feedback:""},
+    {name:"Aman Vashishtha",report:null,contact:"9761937750",feedback:""},
+    {name:"Kundan Yadav",report:null,contact:"9432899163",feedback:""},
+    {name:"Pratham Suri",report:null,contact:"7696961024",feedback:""}
+  ]}
+];
+
+// ── Build hiring map ──
+function comboKey(arr){ return arr.slice().sort().join("|"); }
+var hiringMap = {};
+HIRINGS.forEach(function(h){
+  var k = comboKey(h.features);
+  if(!hiringMap[k]) hiringMap[k] = [];
+  hiringMap[k].push(h);
+});
+
+// ── Generate combinations ──
+function getCombinations(arr, r){
+  var res = [];
+  function bt(start, cur){
+    if(cur.length === r){ res.push(cur.slice()); return; }
+    for(var i=start; i<arr.length; i++){ cur.push(arr[i]); bt(i+1,cur); cur.pop(); }
+  }
+  bt(0,[]);
+  return res;
+}
+var KEYS = FEATURES.map(function(f){ return f.key; });
+var assignedKeys = {};
+Object.keys(hiringMap).forEach(function(k){ assignedKeys[k]=true; });
+var assignedCombos = [];
+var unassignedByCount = {};
+for(var r=2; r<=12; r++){
+  unassignedByCount[r] = [];
+  getCombinations(KEYS,r).forEach(function(c){
+    if(assignedKeys[comboKey(c)]) assignedCombos.push(c);
+    else unassignedByCount[r].push(c);
+  });
+}
+var totalUnassigned = 0;
+for(var rr=2; rr<=12; rr++) totalUnassigned += unassignedByCount[rr].length;
+function seededShuffle(arr, seed){
+  var a = arr.slice(), s = seed;
+  for(var i=a.length-1;i>0;i--){
+    s = ((s*1664525)+1013904223)|0;
+    var j = Math.abs(s) % (i+1);
+    var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+var sampled = [];
+for(var rv=2; rv<=12; rv++){
+  var pool = unassignedByCount[rv];
+  var quota = Math.round((pool.length/totalUnassigned)*974);
+  seededShuffle(pool, rv*31337).slice(0,quota).forEach(function(c){ sampled.push(c); });
+}
+var ALL_COMBOS = assignedCombos.concat(sampled);
+ALL_COMBOS.sort(function(a,b){ return a.length-b.length || comboKey(a).localeCompare(comboKey(b)); });
+var seenKeys = {};
+ALL_COMBOS = ALL_COMBOS.filter(function(c){
+  var k=comboKey(c);
+  if(seenKeys[k]) return false;
+  seenKeys[k]=true; return true;
+});
+
+// ── State ──
+var roles = ["All"].concat(HIRINGS.reduce(function(acc,h){
+  if(acc.indexOf(h.role)<0) acc.push(h.role); return acc;
+},[]));
+var activeRole="All", activeCount="all", searchTerm="", activeFeat={};
+var openRows={}, currentPage=0;
+var PAGE_SIZE=50;
+
+// ── Render header stats ──
+function renderHeader(){
+  var totalC = HIRINGS.reduce(function(a,h){return a+h.candidates.length;},0);
+  document.getElementById("hdrStats").innerHTML =
+    '<div class="hstat-val">'+ALL_COMBOS.length+'</div><div class="hstat-lbl">Combinations</div>' +
+    '<div style="margin-left:20px"><div class="hstat-val">'+HIRINGS.length+'</div><div class="hstat-lbl">Hirings</div></div>' +
+    '<div style="margin-left:20px"><div class="hstat-val">'+totalC+'</div><div class="hstat-lbl">Candidates</div></div>';
+}
+
+// ── Sidebar roles ──
+function renderRoles(){
+  var html="";
+  roles.forEach(function(r){
+    var cnt = r==="All" ? HIRINGS.length : HIRINGS.filter(function(h){return h.role===r;}).length;
+    html += '<button class="role-btn'+(r===activeRole?" active":"")+'" onclick="setRole(\''+r+'\')">' +
+      '<span>'+r+'</span><span class="rbadge">'+cnt+'</span></button>';
+  });
+  document.getElementById("roleList").innerHTML = html;
+}
+
+// ── Feature chips ──
+function renderFeatChips(){
+  var html="";
+  FEATURES.forEach(function(f){
+    html += '<span class="fchip'+(activeFeat[f.key]?" active":"")+'" onclick="toggleFeat(\''+f.key+'\')">' +
+      '<span class="fchip-dot" style="background:'+f.dot+'"></span>'+f.label+'</span>';
+  });
+  document.getElementById("featChips").innerHTML = html;
+}
+
+// ── Fcount tabs ──
+function renderFcountTabs(){
+  var counts = ["all"];
+  var seen2 = {};
+  ALL_COMBOS.forEach(function(c){ seen2[c.length]=true; });
+  Object.keys(seen2).sort(function(a,b){return +a-+b;}).forEach(function(k){ counts.push(k); });
+  var html="";
+  counts.forEach(function(t){
+    html += '<button class="fct'+(t===activeCount?" active":"")+'" onclick="setCount(\''+t+'\')">'+(t==="all"?"All":t)+'</button>';
+  });
+  document.getElementById("fcountTabs").innerHTML = html;
+}
+
+function setRole(r){ activeRole=r; currentPage=0; openRows={}; renderRoles(); render(); }
+function setCount(c){ activeCount=c; currentPage=0; openRows={}; renderFcountTabs(); render(); }
+function toggleFeat(k){ activeFeat[k]=!activeFeat[k]; currentPage=0; openRows={}; renderFeatChips(); render(); }
+function onSearch(){ searchTerm=document.getElementById("searchInput").value; currentPage=0; openRows={}; render(); }
+function toggleRow(g){ openRows[g]=!openRows[g]; render(); }
+
+function getFiltered(){
+  var list = ALL_COMBOS;
+  if(activeCount!=="all") list = list.filter(function(c){return c.length===+activeCount;});
+  if(document.getElementById("onlyHiring").checked) list = list.filter(function(c){return !!hiringMap[comboKey(c)];});
+  if(activeRole!=="All") list = list.filter(function(c){
+    var h=hiringMap[comboKey(c)]; return h && h.some(function(x){return x.role===activeRole;});
+  });
+  var activeFeatKeys = Object.keys(activeFeat).filter(function(k){return activeFeat[k];});
+  if(activeFeatKeys.length>0) list = list.filter(function(c){
+    return activeFeatKeys.every(function(fk){return c.indexOf(fk)>=0;});
+  });
+  if(searchTerm){
+    var s=searchTerm.toLowerCase();
+    list = list.filter(function(c){
+      var fm = c.some(function(k){ var f=FEATURES.find(function(x){return x.key===k;}); return f&&f.label.toLowerCase().indexOf(s)>=0; });
+      var hm = hiringMap[comboKey(c)] && hiringMap[comboKey(c)].some(function(h){
+        return h.name.toLowerCase().indexOf(s)>=0 || h.candidates.some(function(cd){return cd.name.toLowerCase().indexOf(s)>=0;});
+      });
+      return fm||hm;
+    });
+  }
+  return list;
+}
+
+function statusOf(c){
+  var fb = (c.feedback||"").toLowerCase();
+  if(fb.indexOf("no issue")>=0||fb.indexOf("call done")>=0||fb.indexOf("no difficulties")>=0) return {cls:"sp-ok",label:"✓ OK"};
+  if(c.feedback&&c.feedback.trim()) return {cls:"sp-warn",label:"⚠ Issue"};
+  if(!c.report&&!c.feedback) return {cls:"sp-pend",label:"Pending"};
+  return {cls:"sp-pend",label:"Partial"};
+}
+
+function render(){
+  var filtered = getFiltered();
+  var total = filtered.length;
+  var pages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  if(currentPage>=pages) currentPage=pages-1;
+  var slice = filtered.slice(currentPage*PAGE_SIZE, (currentPage+1)*PAGE_SIZE);
+  var offset = currentPage*PAGE_SIZE;
+
+  document.getElementById("countInfo").innerHTML =
+    '<span class="chip chip-blue">'+assignedCombos.length+' hirings</span>' +
+    '<span class="chip chip-green">'+HIRINGS.reduce(function(a,h){return a+h.candidates.length;},0)+' candidates</span>' +
+    '<span>Showing <strong>'+total.toLocaleString()+'</strong> of '+ALL_COMBOS.length.toLocaleString()+' combinations</span>';
+
+  var listHtml = "";
+  slice.forEach(function(combo, i){
+    var g = offset+i;
+    var key = comboKey(combo);
+    var hirings = hiringMap[key]||[];
+    var hasH = hirings.length>0;
+    var isImported = hasH && hirings.some(function(h){return h.imported;});
+    var isOpen = !!openRows[g];
+
+    var pills = combo.map(function(k){
+      var f=FEATURES.find(function(x){return x.key===k;});
+      return f ? '<span class="pill '+f.color+'">'+f.label+'</span>' : '';
+    }).join("");
+
+    var metaHtml = "";
+    if(hasH){
+      hirings.forEach(function(h){
+        metaHtml += '<span class="'+(h.imported?'h-tag-new':'h-tag')+'">'+h.name+'</span>';
+      });
+      var tc = hirings.reduce(function(a,h){return a+h.candidates.length;},0);
+      metaHtml += '<span class="c-badge">'+tc+'</span>';
+    } else {
+      metaHtml = '<span class="no-h">No hiring</span>';
+    }
+
+    var detailHtml = "";
+    if(isOpen){
+      if(hasH){
+        hirings.forEach(function(h){
+          var rows = h.candidates.map(function(c){
+            var ini = c.name.split(" ").slice(0,2).map(function(n){return n[0];}).join("").toUpperCase();
+            var st = statusOf(c);
+            var rpt = c.report ? '<a class="rpt-link" href="'+c.report+'" target="_blank">↗ View</a>' : '<span class="no-rpt">—</span>';
+            return '<tr>' +
+              '<td><div class="c-name-cell"><div class="c-avatar">'+ini+'</div><div><div class="c-name">'+c.name+'</div><div class="c-contact">'+(c.contact||"—")+'</div></div></div></td>' +
+              '<td><div class="c-fb">'+(c.feedback||'<em style="color:var(--text3)">No feedback</em>')+'</div></td>' +
+              '<td><span class="sp '+st.cls+'">'+st.label+'</span></td>' +
+              '<td>'+rpt+'</td>' +
+              '</tr>';
+          }).join("");
+          detailHtml += '<div class="h-block">' +
+            '<div class="h-block-top">' +
+              '<div><div class="h-block-name">'+h.name+(h.imported?' <span style="font-size:10px;color:var(--green)">(imported)</span>':'')+'</div>' +
+              '<div class="h-block-role">'+h.role+' · '+h.features.length+' features</div></div>' +
+              '<span class="c-badge">'+h.candidates.length+' candidates</span>' +
+            '</div>' +
+            '<table class="cand-tbl"><thead><tr><th>Candidate</th><th>Feedback / Problems</th><th>Status</th><th>Report</th></tr></thead><tbody>'+rows+'</tbody></table>' +
+          '</div>';
+        });
+      } else {
+        detailHtml = '<div class="no-h-msg">No hiring assigned to this combination.</div>';
+      }
+    }
+
+    listHtml +=
+      '<div class="combo-card'+(hasH?" has-hiring":"")+(isImported?" imported":"")+'">' +
+        '<div class="combo-hdr" onclick="toggleRow('+g+')">' +
+          '<span class="combo-idx">#'+String(g+1).padStart(4,"0")+'</span>' +
+          '<div class="feat-pills">'+pills+'</div>' +
+          '<div class="combo-meta">'+metaHtml+'<span class="chev'+(isOpen?" open":"")+'">▾</span></div>' +
+        '</div>' +
+        (isOpen ? '<div class="combo-detail open">'+detailHtml+'</div>' : '') +
+      '</div>';
+  });
+  document.getElementById("comboList").innerHTML = listHtml;
+
+  // Pagination
+  var btns = '<button class="pg-btn" onclick="goPage('+(currentPage-1)+')" '+(currentPage===0?"disabled":"")+'>← Prev</button>';
+  var ps = Math.max(0,currentPage-2), pe = Math.min(pages-1,currentPage+2);
+  for(var p=ps;p<=pe;p++) btns += '<button class="pg-btn'+(p===currentPage?" active":"")+'" onclick="goPage('+p+')">'+(p+1)+'</button>';
+  btns += '<button class="pg-btn" onclick="goPage('+(currentPage+1)+')" '+(currentPage===pages-1?"disabled":"")+'>Next →</button>';
+  btns += '<span class="pg-info">Page '+(currentPage+1)+' / '+pages+' · '+total.toLocaleString()+' results</span>';
+  document.getElementById("pager").innerHTML = btns;
+}
+
+function goPage(p){
+  var f=getFiltered(); var pages=Math.max(1,Math.ceil(f.length/PAGE_SIZE));
+  if(p<0||p>=pages) return;
+  currentPage=p; openRows={}; render();
+  document.querySelector(".list-wrap").scrollTop=0;
+}
+
+// ── MODAL ──
+function openModal(){
+  var sel=document.getElementById("hiringSelect");
+  sel.innerHTML = HIRINGS.map(function(h){
+    return '<option value="'+h.id+'">'+h.name+' ('+h.role+')</option>';
+  }).join("");
+  document.getElementById("pasteArea").value="";
+  document.getElementById("previewBox").classList.remove("show");
+  document.getElementById("overlay").classList.add("open");
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("open"); }
+function overlayClick(e){ if(e.target===document.getElementById("overlay")) closeModal(); }
+
+function parsePaste(text){
+  var lines = text.trim().split("\n").filter(function(l){return l.trim();});
+  var result = [];
+  lines.forEach(function(line){
+    var cols = line.split("\t").map(function(c){return c.trim();});
+    if(!cols[0]) return;
+    var name = cols[0];
+    if(name.toLowerCase()==="name"||name.toLowerCase()==="s.no"||name.toLowerCase()==="sr") return;
+    var report=null, contact="", feedback="";
+    for(var i=1;i<cols.length;i++){
+      var v=cols[i];
+      if(!v) continue;
+      if(v.indexOf("http")===0 && !report){ report=v; continue; }
+      if(/^[6-9]\d{9}$/.test(v.replace(/\s/g,"")) && !contact){ contact=v.replace(/\s/g,""); continue; }
+      if(v.length>2 && !feedback){ feedback=v; }
+    }
+    result.push({name:name,report:report,contact:contact,feedback:feedback});
+  });
+  return result;
+}
+
+function previewParse(){
+  var text = document.getElementById("pasteArea").value;
+  var parsed = parsePaste(text);
+  var box = document.getElementById("previewBox");
+  if(!parsed.length){ box.classList.remove("show"); return; }
+  box.classList.add("show");
+  document.getElementById("previewCount").textContent = parsed.length;
+  document.getElementById("previewBody").innerHTML = parsed.map(function(c){
+    var fb = (c.feedback||"").toLowerCase();
+    var ok = fb.indexOf("no issue")>=0||fb.indexOf("call done")>=0;
+    var warn = c.feedback&&c.feedback.trim()&&!ok;
+    var dotCls = ok?"pdot-ok":warn?"pdot-warn":"pdot-gray";
+    return '<div class="prow"><span class="pdot '+dotCls+'"></span><span class="pname">'+c.name+'</span><span class="pfb">'+(c.feedback||'<em style="color:var(--text3)">—</em>')+'</span></div>';
+  }).join("");
+}
+
+function doImport(){
+  var text = document.getElementById("pasteArea").value;
+  var parsed = parsePaste(text);
+  if(!parsed.length){ alert("No valid data found. Please check your format."); return; }
+  var hid = document.getElementById("hiringSelect").value;
+  var hiring = HIRINGS.find(function(h){return h.id===hid;});
+  if(!hiring) return;
+  hiring.imported = true;
+  parsed.forEach(function(nc){
+    var existing = hiring.candidates.find(function(c){return c.name.toLowerCase()===nc.name.toLowerCase();});
+    if(existing){
+      if(nc.report) existing.report=nc.report;
+      if(nc.contact) existing.contact=nc.contact;
+      if(nc.feedback) existing.feedback=nc.feedback;
+    } else {
+      hiring.candidates.push(nc);
+    }
+  });
+  var k = comboKey(hiring.features);
+  if(!hiringMap[k]) hiringMap[k]=[];
+  if(!hiringMap[k].find(function(h){return h.id===hiring.id;})) hiringMap[k].push(hiring);
+  closeModal();
+  renderHeader();
+  openRows={};
+  render();
+  alert("Imported " + parsed.length + " candidates into \"" + hiring.name + "\"");
+}
+
+// ── Init ──
+renderHeader();
+renderRoles();
+renderFeatChips();
+renderFcountTabs();
+render();
+</script>
+</body>
+</html>
